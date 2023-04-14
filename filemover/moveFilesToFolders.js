@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 
 const folderPath = '/Users/mac/Desktop/untitled folder 2/Output';
-const filesPerFolder = getTotalDirsInDir(folderPath);
 
 // Get all folder names from the given path
 const getFolderNames = (dirPath) => {
@@ -12,15 +11,15 @@ const getFolderNames = (dirPath) => {
 };
 
 function getTotalDirsInDir(dirPath) {
-    // Get the list of files in the directory
-    const files = fs.readdirSync(dirPath);
+  // Get the list of files in the directory
+  const files = fs.readdirSync(dirPath);
   
-    // Filter out non-directories and return the count of directories
-    return files.filter(file => {
-      return fs.statSync(path.join(dirPath, file)).isDirectory();
-    }).length;
-  }
-  
+  // Filter out non-directories and return the count of directories
+  return files.filter(file => {
+    return fs.statSync(path.join(dirPath, file)).isDirectory();
+  }).length;
+}
+
 // Divide files by the number of folders and move to each folder
 const divideFilesByFolders = (filePath, folderNames) => {
   // Get all files from the given path
@@ -51,11 +50,13 @@ const divideFilesByFolders = (filePath, folderNames) => {
   }
 };
 
+// Move files to folders
+const moveFilesToFolders = () => {
+  // Get all folder names from the given path
+  const folderNames = getFolderNames(folderPath);
 
+  // Divide files by the number of folders and move to each folder
+  divideFilesByFolders(folderPath, folderNames);
+};
 
-
-// Get all folder names from the given path
-const folderNames = getFolderNames(folderPath);
-
-// Divide files by the number of folders and move to each folder
-divideFilesByFolders(folderPath, folderNames);
+module.exports = moveFilesToFolders;

@@ -104,12 +104,17 @@ function divideFilesByFolders2(dirPath, numFolders) {
     });
   }
 
+  module.exports ={
+    getTotalDirsInDir,
+    getTotalFilesInDir,
+    divideFilesByFolders
+  }
 // Example usage
-const dirPath = '/Users/mac/Desktop/untitled folder 2/Output';
+/*const dirPath = '/Users/mac/Desktop/untitled folder 2/Output';
 const totalDirs = getTotalDirsInDir(dirPath);
 console.log(`Total number of directories in directory '${dirPath}': ${totalDirs}`);
 const totalFiles = getTotalFilesInDir(dirPath);
 console.log(`Total number of files in directory '${dirPath}': ${totalFiles}`);
 
 const filesMoved = divideFilesByFolders(dirPath, totalDirs);
-console.log(`Moved ${filesMoved} files into ${totalDirs} folders.`);
+console.log(`Moved ${filesMoved} files into ${totalDirs} folders.`);*/
