@@ -3,7 +3,7 @@ const PostData = require('./queries')
  async function decodeResponse(response){
 
     const data = JSON.parse(response);
-
+    if (data !== null) {
 data.forEach(async obj => {
     console.log(obj.id);
     const firstObjInfo = obj.info;
@@ -42,7 +42,9 @@ data.forEach(async obj => {
 //     console.log(`${item.key}: ${item.value}  - ${item.valueCaption}`);
 //   }
   });
-
+    }else{
+        console.log("empty array")
+    }
  }
 
  module.exports = {

@@ -141,8 +141,58 @@ static async getSRDetails(cookieObj, assignedGroupID) {
     }
   }
   
+
+
   
+
+
+  static async getSRDetailsNews(cookieObj, assignedGroupID) {
+    try {
+      const cookieString = `${cookieObj.JSESSIONID}; ${cookieObj.SERVERID}`;
+      console.log("new cookies " + cookieString);
+      const options = {
+        method: "GET",
+        uri: `${process.env.apiUrl}/sr`,
+        qs: {
+          fields: `${process.env.fields}`,
+          assigned_group: assignedGroupID, // replace with the ID of the assigned group you want to filter by
+        },
+        headers: {
+          Cookie: cookieString,
+        },
+        json: true,
+      };
   
+      const response = await request(options);
+      // console.log("outssss : "+JSON.stringify(response))
+      if (response) {
+        //const data = JSON.parse(response);
+        // code that uses the parsed data
+        return JSON.stringify(response);
+      } else {
+        console.error(
+          "Error retrieving SR details: Response is undefined"
+        );
+        return null;
+      }
+    } catch (error) {
+      if (error.statusCode === 401) {
+        console.log(
+          "Non authenticated user error occurred. Calling auth function..."
+        );
+        const authResponse = await this.authenticate();
+        const cookieObj = JSON.parse(authResponse);
+        const srDetailsResponse = await this.getSRDetailsNew(
+          cookieObj,
+          assignedGroupID
+        );
+        return srDetailsResponse;
+      } else {
+        console.error(`Error retrieving SR details: ${error}`);
+        return null;
+      }
+    }
+  }
   
   static async  getSRDetailsNew(cookieObj, assignedGroupID) {
     try {
@@ -173,10 +223,22 @@ static async getSRDetails(cookieObj, assignedGroupID) {
       return null;
     }
      
-    } catch (error) {
+    } 
+    catch (error) {
+      if (error.name === 'StatusCodeError' && error.statusCode === 401 && error.message.includes('Non authenticated user')) {
+        console.log('Authentication required. Authenticating...');
+        const { JSESSIONID, SERVERID } = await authenticate();
+        console.log('Retrying the request with the new cookie...');
+        return await getSRDetailsNew({ JSESSIONID, SERVERID }, assignedGroupID);
+      } else {
+        console.error(`Error retrieving SR details: ${error}`);
+        return null;
+      }
+    }
+    /*catch (error) {
       console.error(`Error retrieving SR details: ${error}`);
       return null;
-    }
+    }*/
   }
   
 
