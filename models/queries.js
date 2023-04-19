@@ -65,12 +65,13 @@ class PostData{
                     if (rows.length > 0) {
                         console.log('Data already exists');
                         //result='Data already exists';
-                    const newqus =`update  tvc set old_status= ? ,status = ?, update_time= ?,close_time= ?
+                    const newqus =`update  tvc set old_status= ? ,status = ?, update_time= ?,close_time= ?, thirdLevelCategory =?
                     where sr_id=? `;
                     const vals = [rows[0].status,
                                     this.status,
                                     moment(this.update_time, 'DD-MM-YYYY HH:mm:ss').format('YYYY-MM-DD HH:mm:ss'),
                                     PostData.formatDatetime(this.close_time),
+                                    this.thirdLevelCategory,
                                     this.sr_id
                                 ]
                                 result =  await connection.query(newqus, vals)
@@ -121,6 +122,48 @@ static async getData(){
     sum(case when status ='Scheduled for Review' then 1 else 0 end ) as Scheduled
     
     from tvc where date(close_time) = CURDATE() 
+                `;
+      const [rows, fields] = await connection.query(query);
+      let result;
+      connection.release(); 
+      console.log(rows);
+     return  rows.length ? [rows] : [[]]
+
+    
+  } catch (error) {
+    connection.release(); 
+    console.log(error);
+    return [[]]
+    
+  }
+
+}
+
+
+static async getDataNew(start,end,type){
+
+  let connection;
+let dates;
+if(type=='Yesterday'){
+  dates = `= CURDATE() - 1`
+}else if (type=='Today'){
+  dates = `= CURDATE()`
+}
+else{
+  dates = `between '${start}' and '${end}'`
+}
+console.log(dates);
+  try {
+    connection = await db.pool.getConnection();
+    const query =`
+    select count(1) as tots,sum(case when status ='Declined - Incomplete Request' then 1 else 0 end ) as Declined,
+    sum(case when status ='Approved for UAT' then 1 else 0 end ) as UAT,
+    sum(case when status ='Validated for CAB' then 1 else 0 end ) as CAB,
+    sum(case when status ='Resolved - Pending customer confirmation' then 1 else 0 end ) as Resolved,
+    sum(case when status ='Request for authorization' then 1 else 0 end ) as RequestA,
+    sum(case when status ='Scheduled for Review' then 1 else 0 end ) as Scheduled
+    
+    from tvc where date(close_time) ${dates}
                 `;
       const [rows, fields] = await connection.query(query);
       let result;

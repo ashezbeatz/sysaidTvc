@@ -35,9 +35,17 @@ class IndexController{
     }
 
     static async curData(req,res,next){
-
+      console.log('Received a GET request!');
+      console.log('req.method:', req.method);
+      console.log('req.url:', req.url);
+      console.log('req.headers:', req.headers);
+      console.log('req.query:', req.query);
+      const { start, end, type } = req.query;
+      console.log('start:', start);
       try {
-        let [data] =await PostData.getData();
+      
+     
+        let [data] =await PostData.getDataNew(start,end,type);
         res.status(200).json({data})
     } catch (error) {
         console.log(error)
