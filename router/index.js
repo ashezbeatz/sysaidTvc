@@ -9,6 +9,8 @@ Route.get('/getCurData', IndexController.curData)
 Route.get('/getOtherStatus', IndexController.otherStatus)
 Route.get('/Leaderboard', IndexController.Leaderboard)
 
+Route.get('/getStatus', IndexController.getStatus)
+
 
 
 

@@ -1,6 +1,7 @@
+//const axios = require('axios');
 const cookie = require('cookie');
 const request = require('request-promise');
-const axios = require('axios');
+
 //const { cookie } = require('request');
 
 require("dotenv").config();
@@ -8,6 +9,49 @@ require("dotenv").config();
 class RestApiSysaid{
 
   static async authenticate() {
+    try {
+      // Check if there is an existing cookie
+      const existingCookie = process.env.cookie;
+      console.log(`Existing cookie: ${existingCookie}`);
+      if (existingCookie) {
+        let { JSESSIONID, SERVERID } = cookie.parse(existingCookie);
+        console.log(`Using existing session:  JSESSIONID=${JSESSIONID};  SERVERID=${SERVERID}`);
+        JSESSIONID= `JSESSIONID=${JSESSIONID}`
+        SERVERID= `SERVERID=${SERVERID}`
+        return { JSESSIONID, SERVERID};
+      }
+  console.log(`sysaid username : ${process.env.sysaidusername}`)
+      // Authenticate and retrieve new cookie
+      const options = {
+        method: 'POST',
+        uri: `${process.env.apiUrl}/login`,
+        body: {
+          user_name: `${process.env.sysaidusername}`,
+          password: `${process.env.password}`
+        },
+        json: true,
+        resolveWithFullResponse: true
+      };
+      const response = await request(options);
+  
+      const cookies = response.headers['set-cookie'];
+      const JSESSIONID = cookies.find((cookie) => cookie.includes('JSESSIONID'));
+      const SERVERID = cookies.find((cookie) => cookie.includes('SERVERID'));
+      console.log(`New session: ${JSESSIONID}; ${SERVERID}`);
+  
+      // Create the new cookie
+      const newCookie = `${JSESSIONID}; ${SERVERID}; Path=/; Secure; HttpOnly; SameSite=Lax`;
+      console.log(`New cookie: ${newCookie}`);
+  
+      // Set the cookies in the environment variable for future requests
+      process.env.cookie = newCookie;
+      return { JSESSIONID, SERVERID };
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to authenticate with SysAid API');
+    }
+  }
+  /*static async authenticate() {
     try {
       // Check if there is an existing cookie
       const existingCookie = process.env.cookie;
@@ -83,7 +127,7 @@ class RestApiSysaid{
       console.error(error);
       throw new Error('Failed to authenticate with SysAid API');
     }
-  }
+  }*/
 //username, password
 static async authenticate2() {
     try {
@@ -227,9 +271,9 @@ static async getSRDetails(cookieObj, assignedGroupID) {
     catch (error) {
       if (error.name === 'StatusCodeError' && error.statusCode === 401 && error.message.includes('Non authenticated user')) {
         console.log('Authentication required. Authenticating...');
-        const { JSESSIONID, SERVERID } = await authenticate();
+        const { JSESSIONID, SERVERID } = await this.authenticate();
         console.log('Retrying the request with the new cookie...');
-        return await getSRDetailsNew({ JSESSIONID, SERVERID }, assignedGroupID);
+        return await this.getSRDetailsNew({ JSESSIONID, SERVERID }, assignedGroupID);
       } else {
         console.error(`Error retrieving SR details: ${error}`);
         return null;

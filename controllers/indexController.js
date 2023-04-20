@@ -2,8 +2,8 @@
 require("dotenv").config();
 const RestSysaidApi = require('../functions/RestApiSysaid');
 const jsonCon =  require('../models/jsonConverter')
-const sysAid =  require('../functions/SysAidAPI')
-const sysAidNew  = require('../functions/SysAidRestApiNew');
+//const sysAid =  require('../functions/SysAidAPI')
+//const sysAidNew  = require('../functions/SysAidRestApiNew');
 const PostData = require('../models/queries')
 
 class IndexController{
@@ -35,11 +35,11 @@ class IndexController{
     }
 
     static async curData(req,res,next){
-      console.log('Received a GET request!');
+      /*console.log('Received a GET request!');
       console.log('req.method:', req.method);
       console.log('req.url:', req.url);
       console.log('req.headers:', req.headers);
-      console.log('req.query:', req.query);
+      console.log('req.query:', req.query);*/
       const { start, end, type } = req.query;
       console.log('start:', start);
       try {
@@ -62,6 +62,38 @@ class IndexController{
         next(error) 
     }
     }
+
+
+    static async getStatus(req,res,next){
+      console.log('Received a GET request!');
+      console.log('req.method:', req.method);
+      console.log('req.url:', req.url);
+      console.log('req.headers:', req.headers);
+      console.log('req.query:', req.query);
+      const { start, end, type } = req.query;
+      console.log('start:', start);
+      try {
+      
+     
+        let [data] =await PostData.getDataNewStatus(start,end,type);
+        res.status(200).json({data})
+    } catch (error) {
+        console.log(error)
+        next(error) 
+    }
+    }
+    static async otherStatus(req,res,next){
+
+      try {
+        let [data] =await PostData.getOtherStatus();
+        res.status(200).json({data})
+    } catch (error) {
+        console.log(error)
+        next(error) 
+    }
+    }
+
+
     static async Leaderboard(req,res,next){
 
       try {

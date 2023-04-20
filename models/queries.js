@@ -181,6 +181,64 @@ console.log(dates);
 
 }
 
+
+static async getDataNewStatus(start,end,type){
+
+  let connection;
+let dates;
+if(type=='Declined'){
+  dates = ` status ='Declined - Incomplete Request' 
+  and date(close_time) between '${start}' and '${end}'  `
+}else if (type=='UAT'){
+  dates = `status ='Approved for UAT' 
+  and date(close_time) between '${start}' and '${end}'`
+}else if(type=='CAB'){
+  dates = `status ='Validated for CAB' 
+  and date(close_time) between '${start}' and '${end}'`
+}else if(type =='New'){
+  dates = `status ='New' 
+ `
+}
+else if(type =='InProgress'){
+  dates = `status in('In Progress' ,'Review In Progress') `
+}
+else if(type =='Resolved'){
+  dates = `status ='Resolved - Pending customer confirmation' 
+  and date(close_time) between '${start}' and '${end}'`
+}
+else if(type =='RequestA'){
+  dates = `status ='Request for authorization' 
+  and date(close_time) between '${start}' and '${end}'`
+}
+else if(type =='Scheduled'){
+  dates = `Scheduled for Review' 
+  and date(close_time) between '${start}' and '${end}'`
+}
+else{
+  dates = `date(close_time) between '${start}' and '${end}'`
+}
+console.log(dates);
+  try {
+    connection = await db.pool.getConnection();
+    const query =`
+    select * from tvc where ${dates}
+                `;
+      const [rows, fields] = await connection.query(query);
+      let result;
+      connection.release(); 
+      console.log(rows);
+     return  rows.length ? [rows] : [[]]
+
+    
+  } catch (error) {
+    connection.release(); 
+    console.log(error);
+    return [[]]
+    
+  }
+
+}
+
 static async getOtherStatus(){
 
   let connection;
