@@ -16,15 +16,22 @@ class IndexController{
           //  console.log(`session id : ${sessionId}`);
             const assignedGroupID = `${process.env.assigned_group}`;
             const srList  = await RestSysaidApi.getSRDetailsNew(sessionId,assignedGroupID)
-            //const srList = await RestSysaidApi.getSRs(sessionId, assignedGroupID);
-          //  console.log("response :  "+srList);
-        // console.log("output New : "+ srList)
-       // const sessionId = await sysAidNew.authenticate();
-    /*   const assignedGroupID = `${process.env.assigned_group}`;
-      const { JSESSIONID, SERVERID } = await sysAidNew.authenticate();
-       const srList = await sysAidNew.getSRDetailsNew({ JSESSIONID, SERVERID }, assignedGroupID);
- */
+          
            jsonCon.decodeResponse(srList);
+           //1292033
+          // const srDetails = await RestSysaidApi.getSRPerDetailsNew(sessionId,1338657);
+          // console.log(srDetails)
+           //jsonCon.decodeSRDetailsResponse(srDetails)
+           const loops = await PostData.getSRS()
+           //console.log(loops)
+           loops.forEach(async item => {
+            // console.log("asdasda"+item.sr_id);
+
+            const srDetails = await RestSysaidApi.getSRPerDetailsNew(sessionId,item.sr_id);
+              //console.log("sr Details "+srDetails)
+              jsonCon.decodeSRDetailsResponse(srDetails)
+         
+          });
            //console.log("output New : "+ JSON.parse(srList))
           // const response = JSON.parse(responseData);
             res.send("Hello from Index Controller")

@@ -47,6 +47,32 @@ data.forEach(async obj => {
     }
  }
 
+ async function decodeSRDetailsResponse(response){
+
+    const data = JSON.parse(response);
+    if (data !== null) {
+        data.id;
+        const info =data.info
+        console.log("id"+ data.id)
+      //  console.log("info"+ data.info)
+       //console.log("key: " + obj.key + ", value: " + obj.value);
+          
+        info.forEach(async obj => {
+            //console.log("title : "+obj.quick_name);
+           // console.log(obj); title
+           if( obj.key==='title'){
+            const title =  obj.value;
+            console.log(title)
+             await PostData.updateSrsData(title,data.id)
+
+           }
+            
+          });
+    }else{
+        console.log("empty array")
+    }
+ }
  module.exports = {
-    decodeResponse
+    decodeResponse,
+    decodeSRDetailsResponse
  }

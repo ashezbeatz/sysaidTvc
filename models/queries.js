@@ -98,6 +98,35 @@ class PostData{
         }
 
     }
+
+     static async updateSrsData(sr_title,sr_id)
+    {
+        let connection;
+        try {
+
+            connection = await db.pool.getConnection();
+      
+           
+            
+            let result;
+                        //result='Data already exists';
+                    const newqus =`update  tvc set sr_title= ? 
+                    where sr_id=? `;
+                    const vals = [sr_title,
+                                 sr_id
+                                ]
+                                result =  await connection.query(newqus, vals)
+                           
+                          console.log("update data : "+result+" : status :"+JSON.stringify(result))
+                        
+                          connection.release();
+                        return result;
+                    
+        } catch (error) {
+            console.log(error); 
+        }
+
+    }
     static  formatDatetime(datetime) {
         if (!datetime) {
           return null;
@@ -121,7 +150,7 @@ static async getData(){
     sum(case when status ='Request for authorization' then 1 else 0 end ) as RequestA,
     sum(case when status ='Scheduled for Review' then 1 else 0 end ) as Scheduled
     
-    from tvc where date(close_time) = CURDATE() 
+    from tvc where date(close_time) = CURDATE()  and sr_type !='Change'
                 `;
       const [rows, fields] = await connection.query(query);
       let result;
@@ -136,9 +165,33 @@ static async getData(){
     return [[]]
     
   }
-
+ 
 }
 
+static async getSRS(){
+
+  let connection;
+
+  try {
+    connection = await db.pool.getConnection();
+    const query =`
+    select sr_id from tvc where sr_title is null
+                `;
+      const [rows, fields] = await connection.query(query);
+      let result;
+      connection.release(); 
+      console.log(rows);
+     return  rows.length ? rows : []
+
+    
+  } catch (error) {
+    connection.release(); 
+    console.log(error);
+    return [[]]
+    
+  }
+
+}
 
 static async getDataNew(start,end,type){
 
@@ -163,7 +216,7 @@ console.log(dates);
     sum(case when status ='Request for authorization' then 1 else 0 end ) as RequestA,
     sum(case when status ='Scheduled for Review' then 1 else 0 end ) as Scheduled
     
-    from tvc where date(close_time) ${dates}
+    from tvc where date(close_time) ${dates}  and sr_type !='Change'
                 `;
       const [rows, fields] = await connection.query(query);
       let result;
@@ -188,34 +241,37 @@ static async getDataNewStatus(start,end,type){
 let dates;
 if(type=='Declined'){
   dates = ` status ='Declined - Incomplete Request' 
-  and date(close_time) between '${start}' and '${end}'  `
+  and date(close_time) between '${start}' and '${end}'  and sr_type !='Change' `
 }else if (type=='UAT'){
   dates = `status ='Approved for UAT' 
-  and date(close_time) between '${start}' and '${end}'`
+  and date(close_time) between '${start}' and '${end}' and sr_type !='Change'`
 }else if(type=='CAB'){
   dates = `status ='Validated for CAB' 
-  and date(close_time) between '${start}' and '${end}'`
+  and date(close_time) between '${start}' and '${end}' and sr_type !='Change'`
 }else if(type =='New'){
-  dates = `status ='New' 
+  dates = `status ='New'  and sr_type !='Change'
+ `
+}else if(type =='Pending'){
+  dates = `status ='Pending'  and sr_type !='Change'
  `
 }
 else if(type =='InProgress'){
-  dates = `status in('In Progress' ,'Review In Progress') `
+  dates = `status in('In Progress' ,'Review In Progress') and sr_type !='Change' `
 }
 else if(type =='Resolved'){
   dates = `status ='Resolved - Pending customer confirmation' 
-  and date(close_time) between '${start}' and '${end}'`
+  and date(close_time) between '${start}' and '${end}' and sr_type !='Change'`
 }
 else if(type =='RequestA'){
   dates = `status ='Request for authorization' 
-  and date(close_time) between '${start}' and '${end}'`
+  and date(close_time) between '${start}' and '${end}' and sr_type !='Change'`
 }
 else if(type =='Scheduled'){
   dates = `Scheduled for Review' 
-  and date(close_time) between '${start}' and '${end}'`
+  and date(close_time) between '${start}' and '${end}' and sr_type !='Change'`
 }
 else{
-  dates = `date(close_time) between '${start}' and '${end}'`
+  dates = `date(close_time) between '${start}' and '${end}' and sr_type !='Change'`
 }
 console.log(dates);
   try {
@@ -251,7 +307,7 @@ static async getOtherStatus(){
     sum(case when status ='New' then 1 else 0 end ) as New,
     sum(case when status ='Pending' then 1 else 0 end ) as Pending
     
-    from tvc  
+    from tvc  where  sr_type !='Change'
                 `;
       const [rows, fields] = await connection.query(query);
       let result;
@@ -286,7 +342,7 @@ static async getLeaderboard(){
      sum(case when status ='Pending' then 1 else 0 end ) as Pending,
       SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) / COUNT(*) * 100 AS Pending_percentage
     
-    from tvc where responsibility !=''
+    from tvc where responsibility !=''  and sr_type !='Change'
      GROUP BY responsibility ORDER BY Resolve DESC  
                 `;
       const [rows, fields] = await connection.query(query);

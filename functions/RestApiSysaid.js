@@ -284,6 +284,48 @@ static async getSRDetails(cookieObj, assignedGroupID) {
       return null;
     }*/
   }
+  static async  getSRPerDetailsNew(cookieObj, assignedGroupID) {
+    try {
+        const cookieString = `${cookieObj.JSESSIONID}; ${cookieObj.SERVERID}`;
+        console.log("new cookies "+ cookieString)
+      const options = {
+        method: 'GET',
+        uri: `${process.env.apiUrl}/sr/${assignedGroupID}`,
+        headers: {
+            Cookie: cookieString,
+        },
+        json: true
+      };
+  
+      const response = await request(options);
+      
+     // console.log("outssss : "+JSON.stringify(response))
+     if (response) {
+      //const data = JSON.parse(response);
+      // code that uses the parsed data
+      return JSON.stringify(response);
+    } else {
+      console.error('Error retrieving SR details: Response is undefined');
+      return null;
+    }
+     
+    } 
+    catch (error) {
+      if (error.name === 'StatusCodeError' && error.statusCode === 401 && error.message.includes('Non authenticated user')) {
+        console.log('Authentication required. Authenticating...');
+        const { JSESSIONID, SERVERID } = await this.authenticate();
+        console.log('Retrying the request with the new cookie...');
+        return await this.getSRPerDetailsNew({ JSESSIONID, SERVERID }, assignedGroupID);
+      } else {
+        console.error(`Error retrieving SR details: ${error}`);
+        return null;
+      }
+    }
+    /*catch (error) {
+      console.error(`Error retrieving SR details: ${error}`);
+      return null;
+    }*/
+  }
   
 
     static async getSRDetails2(sessionId, assignedGroupID) {
