@@ -209,6 +209,47 @@ console.log(dates);
   try {
     connection = await db.pool.getConnection();
     const query =`
+    SELECT COUNT(1) AS tots,
+    COALESCE(SUM(CASE WHEN status = 'Declined - Incomplete Request' THEN 1 ELSE 0 END), 0) AS Declined,
+    COALESCE(SUM(CASE WHEN status = 'Approved for UAT' THEN 1 ELSE 0 END), 0) AS UAT,
+    COALESCE(SUM(CASE WHEN status = 'Validated for CAB' THEN 1 ELSE 0 END), 0) AS CAB,
+    COALESCE(SUM(CASE WHEN status = 'Resolved - Pending customer confirmation' THEN 1 ELSE 0 END), 0) AS Resolved,
+    COALESCE(SUM(CASE WHEN status = 'Request for authorization' THEN 1 ELSE 0 END), 0) AS RequestA,
+    COALESCE(SUM(CASE WHEN status = 'Scheduled for Review' THEN 1 ELSE 0 END), 0) AS Scheduled
+  
+    from tvc where date(close_time) ${dates}  and sr_type !='Change'
+                `;
+      const [rows, fields] = await connection.query(query);
+      let result;
+      connection.release(); 
+      console.log(rows);
+     return  rows.length ? [rows] : [[]]
+
+    
+  } catch (error) {
+    connection.release(); 
+    console.log(error);
+    return [[]]
+    
+  }
+
+}
+static async getDataNew2(start,end,type){
+
+  let connection;
+let dates;
+if(type=='Yesterday'){
+  dates = `= CURDATE() - 1`
+}else if (type=='Today'){
+  dates = `= CURDATE()`
+}
+else{
+  dates = `between '${start}' and '${end}'`
+}
+console.log(dates);
+  try {
+    connection = await db.pool.getConnection();
+    const query =`
     select count(1) as tots,sum(case when status ='Declined - Incomplete Request' then 1 else 0 end ) as Declined,
     sum(case when status ='Approved for UAT' then 1 else 0 end ) as UAT,
     sum(case when status ='Validated for CAB' then 1 else 0 end ) as CAB,
@@ -303,9 +344,9 @@ static async getOtherStatus(){
     connection = await db.pool.getConnection();
     const query =`
     select count(1) as tots,
-    sum(case when status in('In Progress' ,'Review In Progress')then 1 else 0 end ) as InProgress,
-    sum(case when status ='New' then 1 else 0 end ) as New,
-    sum(case when status ='Pending' then 1 else 0 end ) as Pending
+    COALESCE(sum(case when status in('In Progress' ,'Review In Progress')then 1 else 0 end ),0) as InProgress,
+    COALESCE(sum(case when status ='New' then 1 else 0 end ),0) as New,
+    COALESCE(sum(case when status ='Pending' then 1 else 0 end ),0) as Pending
     
     from tvc  where  sr_type !='Change'
                 `;
