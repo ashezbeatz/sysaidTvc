@@ -99,6 +99,7 @@ class IndexController {
             let {
                 tiketid,
                 sr_title,
+                third_category,
                 requestor,
                 responsibility,
                 assign_group,
@@ -123,9 +124,14 @@ class IndexController {
                 comments
             } = req.body
 
-            //let [data] = await PostData.getDataNewStatus(start, end, type);
-            res.status(200).json({ "data": "dasasda" })
-                // res.status(200).json({ data })
+            let [data] = await PostData.saveDetails(tiketid, sr_title, third_category, requestor, responsibility, assign_group, company, status, sr_type, ticket_date, input_type, service_name, approved_test_cases, test_case_approver, cleared, request_clearance_cab, cab_cleared_by, test_type, performance_received, performance, results, breach, test_lead, timeline, comments);
+            //res.status(200).json({ "data": "dasasda" })
+            if (data == "Data already exists") {
+                res.status(201).json({ data })
+            } else {
+                res.status(200).json({ data })
+            }
+
         } catch (error) {
             console.log(error)
             next(error)
