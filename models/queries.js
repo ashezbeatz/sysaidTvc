@@ -463,6 +463,12 @@ class PostData {
                 and '${end}'
                 and sr_type != 'Change'
                 `
+        } else if (type == 'Active') {
+            dates = `
+            status in ('In Progress', 'Review In Progress','New','Pending')
+            
+            and sr_type != 'Change'
+            `
         } else {
             dates = `
                 date(close_time) between '${start}'
@@ -497,6 +503,50 @@ class PostData {
     }
 
     static async getOtherStatus() {
+
+        let connection;
+
+        try {
+            connection = await db.pool.getConnection();
+            const query = `
+            select count(1) as tots,
+            COALESCE(sum(
+                case when status in ('In Progress', 'Review In Progress') then 1
+                else 0 end), 0) as InProgress,
+            COALESCE(sum(
+                case when status = 'New'
+                then 1
+                else 0 end), 0) as New,
+            COALESCE(sum(
+                case when status = 'Pending'
+                then 1
+                else 0 end), 0) as Pending,
+                                         COALESCE(sum(
+                case when status in ('In Progress', 'Review In Progress','New','Pending') then 1
+                else 0 end), 0) as total
+
+        from tvc where sr_type != 'Change'
+                `;
+            const [rows, fields] = await connection.query(query);
+            let result;
+            connection.release();
+            console.log(rows);
+            return rows.length ? [rows] : [
+                []
+            ]
+
+
+        } catch (error) {
+            connection.release();
+            console.log(error);
+            return [
+                []
+            ]
+
+        }
+
+    }
+    static async getOtherStatusold() {
 
         let connection;
 
