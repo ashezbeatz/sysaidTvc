@@ -22,6 +22,7 @@ const port = process.env.PORT || 3000;
 app.listen(port, function() {
     console.log(`App running @ port: ${port}`);
 
+    // moveFilesToFolders()
     var task = cron.schedule('0 * * * *', () => {
         console.log("Task has submited successfully")
             // const folderPath = '/Users/mac/Desktop/untitled folder 2/Output';

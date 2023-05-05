@@ -469,6 +469,12 @@ class PostData {
             
             and sr_type != 'Change'
             `
+        } else if (type == 'Overaged') {
+            dates = `
+            status in ('In Progress', 'Review In Progress','New','Pending') 
+            and insert_time  < DATE_SUB(NOW(), INTERVAL 7 DAY)
+            and sr_type != 'Change'
+            `
         } else {
             dates = `
                 date(close_time) between '${start}'
@@ -523,7 +529,10 @@ class PostData {
                 else 0 end), 0) as Pending,
                                          COALESCE(sum(
                 case when status in ('In Progress', 'Review In Progress','New','Pending') then 1
-                else 0 end), 0) as total
+                else 0 end), 0) as total,
+            COALESCE(sum(
+                case when status in ('In Progress', 'Review In Progress','New','Pending')and insert_time  < DATE_SUB(NOW(), INTERVAL 7 DAY) then 1
+                else 0 end), 0) as overaged
 
         from tvc where sr_type != 'Change'
                 `;
