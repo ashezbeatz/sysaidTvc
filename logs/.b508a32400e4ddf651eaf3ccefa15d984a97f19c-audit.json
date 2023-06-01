@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/mac/TVCSysaid/logs/.b508a32400e4ddf651eaf3ccefa15d984a97f19c-audit.json",
+    "files": [
+        {
+            "date": 1685559962323,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-05-31.log",
+            "hash": "ee7d4cbfa1d9e2556c689db846e658eee598d36fc4dbd2f839ee6263edc70685"
+        }
+    ],
+    "hashType": "sha256"
+}

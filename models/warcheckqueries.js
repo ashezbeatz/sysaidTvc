@@ -74,8 +74,8 @@ class warCheckerData {
             ];
             const querySelect = `
               SELECT  id,appname FROM  application_info WHERE 
-              appname= ? AND teamid= ?  AND partition_location= ?`;
-            const values = [name, teamid, location];
+              appname= ? AND teamid= ?  AND partition_location= ? and config_name=?`;
+            const values = [name, teamid, location, catergory];
             const [rowsd, fieldsd] = await connection.query(querySelect, values);
             if (rowsd.length > 0) {
                 console.log('Data already exists');

@@ -534,7 +534,7 @@ class PostData {
                 case when status in ('In Progress', 'Review In Progress','New','Pending')and insert_time  < DATE_SUB(NOW(), INTERVAL 7 DAY) then 1
                 else 0 end), 0) as overaged
 
-        from tvc where sr_type != 'Change'
+        from tvc where sr_type != 'Change' and assigned_group_code ='9957'
                 `;
             const [rows, fields] = await connection.query(query);
             let result;
@@ -575,7 +575,7 @@ class PostData {
                         then 1
                         else 0 end), 0) as Pending
 
-                from tvc where sr_type != 'Change'
+                from tvc where sr_type != 'Change' and assigned_group_code ='9957'
                 `;
             const [rows, fields] = await connection.query(query);
             let result;
@@ -654,7 +654,7 @@ class PostData {
                         THEN 1 ELSE 0 END) / COUNT( * ) * 100 AS Pending_percentage
 
                 from tvc where responsibility != ''
-                and sr_type != 'Change'
+                and sr_type != 'Change'  and assigned_group_code ='9957'
                 GROUP BY responsibility ORDER BY Resolve DESC `;
             const [rows, fields] = await connection.query(query);
             let result;

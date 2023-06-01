@@ -1,10 +1,45 @@
+const winston = require('winston');
+const winstonDailyRotateFile = require('winston-daily-rotate-file');
+const path = require('path');
+const fs = require('fs');
 const warCheckerData = require('./models/warcheckqueries')
 const WebLogicAPI = require('./weblogic/WebLogicAPI')
 const CryptoJS = require("crypto-js");
 const cron = require('node-cron');
+require("dotenv").config();
 //const WebLogicAppInfo = require('./weblogic/weblogicchecker')
 
+// Create a log directory path
+const logDirectory = path.join(__dirname, 'logs');
 
+// Create the log directory if it doesn't exist
+if (!fs.existsSync(logDirectory)) {
+    fs.mkdirSync(logDirectory);
+}
+
+// Define the log file name
+const logFileName = 'app-%DATE%.log';
+
+// Define the log file path
+const logFilePath = path.join(logDirectory, logFileName);
+
+// Configure the logger
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.simple()
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winstonDailyRotateFile({
+            filename: logFilePath,
+            datePattern: 'YYYY-MM-DD',
+            maxSize: '500m',
+            maxFiles: '14d',
+        })
+    ]
+});
 // let data = warCheckerData.checkData();
 
 // console.log(data);
@@ -12,10 +47,14 @@ const cron = require('node-cron');
 // for (const row of data) {
 //     console.log(row.acdc_url);
 // }
+console.log("app started......")
+    // Replace the console.log statement
+logger.info("App started...");
 const secretKey = "XkhZG4fW2t2W";
-cron.schedule('*/30 * * * *', () => {
+cron.schedule(`${process.env.corntab}`, () => {
     //staerted
     console.log('Task running every 30 minutes');
+    logger.info('Task running every 30 minutes');
     warCheckerData.checkData().then(async rows => {
         for (const row of rows) {
             console.log(row.acdc_password)
@@ -23,24 +62,35 @@ cron.schedule('*/30 * * * *', () => {
             console.log(row.acdc_username)
             console.log(row.cluster_name)
             console.log(row.teamid)
-                // and so on...
+            logger.info(row.acdc_password);
+            logger.info(row.acdc_url);
+            logger.info(row.acdc_username);
+            logger.info(row.cluster_name);
+            logger.info(row.teamid);
+            // and so on...
             let acdspass;
             let lcdspass;
             const result = decryptData(row.acdc_password, secretKey)
             if (result.success) {
                 console.log("Decryption successful. Decrypted data:", result.data);
+                logger.info("Decryption successful. Decrypted data:", result.data);
+
                 acdspass = result.data
             } else {
                 acdspass = row.acdc_password
+                logger.error("Decryption failed. Error:", acdspass);
                 console.error("Decryption failed. Error:", acdspass);
             }
             const result2 = decryptData(row.ladc_password, secretKey)
             if (result2.success) {
                 console.log("Decryption successful. Decrypted data:", result.data);
+                logger.info("Decryption successful. Decrypted data:", result2.data);
+
                 lcdspass = result2.data
             } else {
                 lcdspass = row.ladc_password
                 console.error("Decryption failed. Error:", lcdspass);
+                logger.error("Decryption failed. Error:", lcdspass);
             }
             const acdc_username = row.acdc_username
             const acdc_url = row.acdc_url
@@ -60,11 +110,13 @@ cron.schedule('*/30 * * * *', () => {
             await acdcweblogic.getDeployedApplications()
                 .then((appList) => {
                     console.log(`acdc list ${appList}`);
+                    logger.info(`ACDC list: ${appList}`);
                 })
                 .catch((err) => {
                     console.error(`
                                         Failed to get Primary deployed applications: $ { err }
                                         `);
+                    logger.error(`Failed to get Primary deployed applications: ${err}`);
                 });
             console.log("secondary")
                 //secondary
@@ -72,6 +124,8 @@ cron.schedule('*/30 * * * *', () => {
             await ldcweblogic.getDeployedApplications()
                 .then((appList) => {
                     console.log(`ldc list ${appList}`);
+                    logger.info(`LDC list: ${appList}`);
+                    logger.error(`Failed to get Secondary deployed applications: ${err}`);
                 })
                 .catch((err) => {
                     console.error(`
