@@ -1,6 +1,6 @@
 const warCheckerData = require('./models/warcheckqueries')
-const WebLogicAPI = require('./weblogic/WebLogicAPI')
-const WebLogicClient = require('./weblogic/WebLogicClient')
+    //const WebLogicAPI = require('./weblogic/WebLogicAPI')
+const WebLogicAPIs = require('./weblogic/WebLogicAPIs')
 const CryptoJS = require("crypto-js");
 const cron = require('node-cron');
 require("dotenv").config();
@@ -35,30 +35,34 @@ warCheckerData.checkData().then(async rows => {
             console.error("Decryption failed. Error:", lcdspass);
         }
         const acdc_username = row.acdc_username
-        const acdc_url = row.acdc_url
+            //const acdc_url = `${row.acdc_url}/management/weblogic/latest`
+        const acdc_url = `${row.acdc_url}`
         const acdc_password = acdspass
         const cluster_name = row.cluster_name
         const teamid = row.teamid
         const location1 = 'primary';
-
-        const client = new WebLogicClient(acdc_url, acdc_username, acdc_password);
-        await client.fetchDeployedApplications()
-            .then((applications) => {
-                applications.forEach((application) => {
-                    console.log(`Application: ${application.name}`);
-                    console.log(`State: ${application.state}`);
-                    console.log(`Size: ${application.size} bytes`);
-                    console.log(`Deployment Time: ${application.deploymentTime}`);
-                    console.log('------------------------');
-                });
+        console.log(acdc_url)
+        const weblogicAPI = new WebLogicAPIs(acdc_url, acdc_username, acdc_password);
+        await weblogicAPI.fetchApplicationDetails()
+            .then(applicationDetails => {
+                if (Array.isArray(applicationDetails) && applicationDetails.length > 0) {
+                    applicationDetails.forEach(details => {
+                        console.log(`Application: ${details.applicationName}`);
+                        console.log(`Deployment Date: ${details.deploymentDate}`);
+                        console.log(`Deployment Size: ${details.deploymentSize}`);
+                        console.log('------------------------------------');
+                    });
+                } else {
+                    console.log('No application details found.');
+                }
             })
-            .catch((error) => {
-                console.error('Error:', error);
+            .catch(error => {
+                console.error(error);
             });
-
         //secondary
         const ladc_username = row.ladc_username
-        const ladc_url = row.ladc_url
+            // const ladc_url = `${row.ladc_url}/management/weblogic/latest`
+        const ladc_url = `${row.ladc_url}`
         const ladc_password = lcdspass
         const location2 = 'Secondary';
 
