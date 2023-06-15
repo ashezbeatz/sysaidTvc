@@ -51,7 +51,7 @@ async function processFolder2(folderPath, name, type, version) {
                 "location": type,
                 "appname": fileName,
                 "teamId": version,
-                "size": formatSize(size),
+                "size": size,
                 "deploymentTime": formatDate(birthtime),
                 "updateTime": formatDate(mtime),
                 "checkSum": checksum

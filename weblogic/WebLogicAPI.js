@@ -26,7 +26,10 @@ class WebLogicAPI {
             const appDeploymentRuntimes = await rp(restOptions);
             const appList = [];
             const currentTime = new Date();
-
+            const {
+                host,
+                port
+            } = await processURL(this.hostname);
             for (const appRuntime of appDeploymentRuntimes.items) {
                 const appSize = appRuntime.archiveSize;
 
@@ -48,7 +51,7 @@ class WebLogicAPI {
                 // Rest of the code...
                 try {
                     //const resp = await warCheckerData.insertAppsInfo(appRuntime.name, `${formattedSize}`, appRuntime.timestamp, currentTime.toLocaleString(), this.teamid, this.cluster, this.location);
-                    const resp = await warCheckerData.insertAppsInfonew(appRuntime.name, this.teamid, this.cluster, this.location);
+                    const resp = await warCheckerData.insertAppsInfonew(appRuntime.name, this.teamid, this.cluster, this.location, host, port);
                     // Handle the response if needed
                 } catch (err) {
                     console.error(`Failed to insert app info: ${err}`);
@@ -155,6 +158,7 @@ class WebLogicAPI {
                     }
 
                     console.log(`Application: ${appRuntime.name}, Size: ${appSize} ${appSizeUnit}, Deployment Time: ${appRuntime.timestamp}`);
+
                     let resp = await warCheckerData.insertAppsInfo(appRuntime.name, ` ${appSize} ${appSizeUnit}`, appRuntime.timestamp, currentTime.toLocaleString(), this.teamid, this.cluster, this.location)
 
                     appList.push({
@@ -170,6 +174,20 @@ class WebLogicAPI {
             console.error(`Failed to connect to WebLogic: ${err}`);
             return [];
         }
+    }
+
+
+
+    /** 
+     *  check
+     */
+    static async processURL(url) {
+        let processedURL = url.replace(/^https?:\/\//, ''); // Remove "http://" or "https://"
+        let [host, port] = processedURL.split(':'); // Split host and port if present
+
+        // Add name or IP logic here (e.g., replace "host" with the desired value)
+
+        return { host, port };
     }
 }
 
