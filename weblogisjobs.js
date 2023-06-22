@@ -90,8 +90,10 @@ async function processFolder(folderPath) {
             console.log(`Checksum: ${checksum}`);
             logger.info(`Checksum: ${checksum}`);
             console.log('---');
+            const info = getMachineInfo();
+            const ipaddress = info.ipAddresses ? info.ipAddresses : process.env.serverip
             const jsonData = {
-                "ipaddress": `${process.env.serverip}`,
+                "ipaddress": `${ipaddress}`,
                 "location": `${process.env.partition}`,
                 "appname": fileName,
                 "port": `${process.env.serverport}`,
@@ -179,6 +181,8 @@ async function getServerInfo() {
         networkInterfaces[interfaceName].forEach((iface) => {
             if (iface.family === 'IPv4' && !iface.internal) {
                 ipAddresses.push(iface.address);
+            } else {
+                ipAddresses.push(iface.address);
             }
         });
     });
@@ -189,6 +193,43 @@ async function getServerInfo() {
     };
 }
 
+function getMachineInfo() {
+    const machineName = os.hostname();
+    const networkInterfaces = os.networkInterfaces();
+    const ipAddresses = [];
+
+    Object.values(networkInterfaces).forEach(interfaces => {
+        interfaces.forEach(interfaceData => {
+            if (interfaceData.family === 'IPv4' && !interfaceData.internal) {
+                ipAddresses.push(interfaceData.address);
+            }
+        });
+    });
+
+    return {
+        machineName,
+        ipAddresses
+    };
+}
+async function getMachineInfo2() {
+    const networkInterfaces = os.networkInterfaces();
+    const machineInfo = {};
+
+    if (Object.keys(networkInterfaces).length === 0) {
+        machineInfo.type = 'Local Machine';
+    } else {
+        const interfaceNames = Object.keys(networkInterfaces);
+        const firstInterface = networkInterfaces[interfaceNames[0]][0];
+        const ipAddress = firstInterface.address;
+
+        machineInfo.type = 'Server';
+        machineInfo.ipAddress = ipAddress;
+    }
+
+    machineInfo.name = os.hostname();
+
+    return machineInfo;
+}
 
 function processURL(url) {
     let processedURL = url.replace(/^https?:\/\//, ''); // Remove "http://" or "https://"
@@ -198,6 +239,8 @@ function processURL(url) {
 
     return { host, port };
 }
+
+///cronjobs
 
 //telnet 
 function telnet(ipAddress, port) {
@@ -223,26 +266,51 @@ function telnet(ipAddress, port) {
 }
 const { host, port } = processURL(`${process.env.apiendpoint}`)
 
-const serverInfo = getServerInfo();
-console.log('Server Name:', serverInfo.serverName);
-console.log('IP Addresses:', serverInfo.ipAddresses);
+// const serverInfo = getServerInfo();
+// console.log('Server Name:', serverInfo.serverName);
+// console.log('IP Addresses:', serverInfo.ipAddresses);
 
-const folderPath = `${process.env.weblogicpath}`; // Replace with the actual folder path
-console.log("----------------check connection---------------")
-logger.info("----------------checking connection---------------")
-telnet(host, port)
-    .then((socket) => {
-        // Telnet connection successful, now call your desired function
-        // myFunction(socket);
-        processFolder(folderPath);
-    })
-    .catch((error) => {
-        console.error('Telnet connection error:', error);
-        logger.error(`Telnet connection error: ${error}`)
-    });
+const info = getMachineInfo();
+console.log('Machine Name:', info.machineName);
+console.log('Machine Type:', info.ipAddresses);
+console.log("-------------------------------")
+console.log('Server Name:', info.machineName);
+console.log('IP Addresses:', info.ipAddresses);
+console.log("-------------------------------")
+logger.info("-------------------------------")
+logger.info('Server Name:', info.machineName);
+logger.info('IP Addresses:', info.ipAddresses);
+logger.info('Machine Name:', info.machineName);
+logger.info('Machine Type:', info.ipAddresses);
+logger.info("-------------------------------")
 
+
+//schuduler 2
+cron.schedule(`${process.env.corntab}`, () => {
+    const folderPath = `${process.env.weblogicpath}`; // Replace with the actual folder path
+
+    console.log('Task running every 5 minutes');
+    console.log("----------------check connection---------------")
+    logger.info("----------------checking connection---------------")
+    telnet(host, port)
+        .then((socket) => {
+            // Telnet connection successful, now call your desired function
+            // myFunction(socket);
+            processFolder(folderPath);
+        })
+        .catch((error) => {
+            console.error('Test connection error:', error);
+            logger.error(`Test connection error: ${error}`)
+        });
+});
 //
 console.log("-------------------------------")
-console.log('Server Name:', serverInfo.serverName);
-console.log('IP Addresses:', serverInfo.ipAddresses);
+console.log('Server Name:', info.machineName);
+console.log('IP Addresses:', info.ipAddresses);
 console.log("-------------------------------")
+logger.info("-------------------------------")
+logger.info('Server Name:', info.machineName);
+logger.info('IP Addresses:', info.ipAddresses);
+logger.info('Machine Name:', info.machineName);
+logger.info('Machine Type:', info.ipAddresses);
+logger.info("-------------------------------")

@@ -1,0 +1,33 @@
+info: App started... {"timestamp":"2023-06-22 08:39:04"}
+info: -------Job 1 started----- {"timestamp":"2023-06-22 08:40:00"}
+info: Task running every 5 minutes */5 * * * * {"timestamp":"2023-06-22 08:40:00"}
+info: -------Job 1 Ended----- {"timestamp":"2023-06-22 08:40:00"}
+info: -------Job 1 started----- {"timestamp":"2023-06-22 08:45:00"}
+info: Task running every 5 minutes */5 * * * * {"timestamp":"2023-06-22 08:45:00"}
+info: -------Job 1 Ended----- {"timestamp":"2023-06-22 08:45:00"}
+info: -------Job 1 started----- {"timestamp":"2023-06-22 08:50:00"}
+info: Task running every 5 minutes */5 * * * * {"timestamp":"2023-06-22 08:50:00"}
+info: -------Job 1 Ended----- {"timestamp":"2023-06-22 08:50:00"}
+info: -------Job 1 started----- {"timestamp":"2023-06-22 08:55:00"}
+info: Task running every 5 minutes */5 * * * * {"timestamp":"2023-06-22 08:55:00"}
+info: -------Job 1 Ended----- {"timestamp":"2023-06-22 08:55:00"}
+info: -------Job 1 started----- {"timestamp":"2023-06-22 09:00:00"}
+info: Task running every 5 minutes */5 * * * * {"timestamp":"2023-06-22 09:00:00"}
+info: -------Job 1 Ended----- {"timestamp":"2023-06-22 09:00:00"}
+info: ---------jobs 2 started------ {"timestamp":"2023-06-22 09:00:00"}
+info: App started... {"timestamp":"2023-06-22 09:02:30"}
+info: -------Job 1 started----- {"timestamp":"2023-06-22 09:05:00"}
+info: Task running every 5 minutes */5 * * * * {"timestamp":"2023-06-22 09:05:00"}
+info: -------Job 1 Ended----- {"timestamp":"2023-06-22 09:05:00"}
+info: ---------jobs 2 started------ {"timestamp":"2023-06-22 09:05:00"}
+info: Task running twice --- */5 * * * * {"timestamp":"2023-06-22 09:05:00"}
+info: ---------jobs 2 ended------ {"timestamp":"2023-06-22 09:05:00"}
+info: Autom@te202342 {"timestamp":"2023-06-22 09:05:00"}
+info: http://10.8.176.115:7002 {"timestamp":"2023-06-22 09:05:00"}
+info: automatedw {"timestamp":"2023-06-22 09:05:00"}
+info: AWA {"timestamp":"2023-06-22 09:05:00"}
+info: 2 {"timestamp":"2023-06-22 09:05:00"}
+error: Decryption failed. Error: {"timestamp":"2023-06-22 09:05:00"}
+error: Decryption failed. Error: {"timestamp":"2023-06-22 09:05:00"}
+info: ACDC list:  {"timestamp":"2023-06-22 09:06:15"}
+info: App started... {"timestamp":"2023-06-22 09:08:24"}

@@ -31,6 +31,26 @@ class warCheckerData {
             return [];
         }
     }
+    static async checkData5m() {
+        let connection;
+
+        try {
+            connection = await db.pool.getConnection();
+            const query = `SELECT
+           acdc_password,acdc_url,acdc_username,ladc_password,ladc_url,ladc_username,category,
+           cluster_name,teamid,id
+           from configs where status='Active' and set_jobs_status='0'`;
+            const [rows, fields] = await connection.query(query);
+            connection.release();
+            console.log(rows);
+            return rows;
+
+        } catch (error) {
+            connection.release();
+            console.log(error);
+            return [];
+        }
+    }
 
     static async insertAppInfo(info, teamid, catergory, location) {
         let connection;
@@ -54,6 +74,23 @@ class warCheckerData {
         } catch (error) {
 
 
+        }
+
+    }
+
+
+    static async updateConfigs(id) {
+        let connection;
+        try {
+
+            connection = await db.pool.getConnection();
+            const query = ` UPDATE  configs set set_jobs_status= '1' where id = ?`;
+            const values2 = [id];
+            const [rows, fields] = await connection.query(query, values2);
+
+            connection.release();
+        } catch (error) {
+            console.log(error);
         }
 
     }
