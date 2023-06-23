@@ -21,7 +21,7 @@ class WebLogicAPI {
             },
             json: true
         };
-
+        console.log(`urls ---- ${this.hostname}/management/weblogic/latest/domainRuntime/deploymentManager/appDeploymentRuntimes`)
         try {
             const appDeploymentRuntimes = await rp(restOptions);
             const appList = [];
@@ -29,7 +29,7 @@ class WebLogicAPI {
             const {
                 host,
                 port
-            } = await processURL(this.hostname);
+            } = await this.processURL(this.hostname);
             for (const appRuntime of appDeploymentRuntimes.items) {
                 const appSize = appRuntime.archiveSize;
 
@@ -68,7 +68,7 @@ class WebLogicAPI {
 
             return appList;
         } catch (err) {
-            console.error(`Failed to connect to WebLogic: ${err}`);
+            console.error(`Failed to connect to WebLogic: ${err} --- ${this.hostname}/management/weblogic/latest/domainRuntime/deploymentManager/appDeploymentRuntimes`);
             return [];
         }
     }
@@ -181,7 +181,7 @@ class WebLogicAPI {
     /** 
      *  check
      */
-    static async processURL(url) {
+    async processURL(url) {
         let processedURL = url.replace(/^https?:\/\//, ''); // Remove "http://" or "https://"
         let [host, port] = processedURL.split(':'); // Split host and port if present
 

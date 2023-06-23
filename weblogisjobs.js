@@ -10,11 +10,17 @@ const net = require('net');
 require("dotenv").config();
 
 // Create a log directory path
-const logDirectory = path.join(__dirname, 'logs');
+const logDirectory = path.join(process.cwd(), 'logs');
 
 // Create the log directory if it doesn't exist
+// if (!fs.existsSync(logDirectory)) {
+//     fs.mkdirSync(logDirectory);
+// }
 if (!fs.existsSync(logDirectory)) {
     fs.mkdirSync(logDirectory);
+    console.log('Folder created successfully.');
+} else {
+    console.log('Folder already exists.');
 }
 
 // Define the log file name
@@ -286,23 +292,23 @@ logger.info("-------------------------------")
 
 
 //schuduler 2
-cron.schedule(`${process.env.corntab}`, () => {
-    const folderPath = `${process.env.weblogicpath}`; // Replace with the actual folder path
+//cron.schedule(`${process.env.corntab}`, () => {
+const folderPath = `${process.env.weblogicpath}`; // Replace with the actual folder path
 
-    console.log('Task running every 5 minutes');
-    console.log("----------------check connection---------------")
-    logger.info("----------------checking connection---------------")
-    telnet(host, port)
-        .then((socket) => {
-            // Telnet connection successful, now call your desired function
-            // myFunction(socket);
-            processFolder(folderPath);
-        })
-        .catch((error) => {
-            console.error('Test connection error:', error);
-            logger.error(`Test connection error: ${error}`)
-        });
-});
+console.log('Task running every 5 minutes');
+console.log("----------------check connection---------------")
+logger.info("----------------checking connection---------------")
+telnet(host, port)
+    .then((socket) => {
+        // Telnet connection successful, now call your desired function
+        // myFunction(socket);
+        processFolder(folderPath);
+    })
+    .catch((error) => {
+        console.error('Test connection error:', error);
+        logger.error(`Test connection error: ${error}`)
+    });
+//});
 //
 console.log("-------------------------------")
 console.log('Server Name:', info.machineName);

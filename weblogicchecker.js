@@ -1,6 +1,8 @@
 const winston = require('winston');
 const winstonDailyRotateFile = require('winston-daily-rotate-file');
+const { createLogger, transports } = require('winston');
 const path = require('path');
+const mkdirp = require('mkdirp');
 const fs = require('fs');
 const warCheckerData = require('./models/warcheckqueries')
 const WebLogicAPI = require('./weblogic/WebLogicAPI')
@@ -9,19 +11,74 @@ const cron = require('node-cron');
 require("dotenv").config();
 //const WebLogicAppInfo = require('./weblogic/weblogicchecker')
 
+/*const logger = createLogger({
+    level: 'info',
+    format: winston.format.simple(),
+    transports: [
+        new transports.Console(),
+        new winstonDailyRotateFile({
+            filename: 'logs/warchecker-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: true,
+            maxSize: '20m',
+            maxFiles: '14d'
+        })
+    ]
+});*/
+
 // Create a log directory path
-const logDirectory = path.join(__dirname, 'logs');
+/*const logDirectory = path.join(__dirname, 'logs');
 
 // Create the log directory if it doesn't exist
-if (!fs.existsSync(logDirectory)) {
-    fs.mkdirSync(logDirectory);
-}
+// if (!fs.existsSync(logDirectory)) {
+//     fs.mkdirSync(logDirectory);
+// }
 
+// Check if the log directory exists
+/*fs.stat(logDirectory, (err, stats) => {
+    if (err) {
+        // Directory doesn't exist, create it using mountpoints
+        fs.mkdir(logDirectory, { recursive: true, mode: 0o755 }, (err) => {
+            if (err) {
+                console.error('Error creating log directory:', err);
+            } else {
+                console.log('Log directory created successfully');
+            }
+        });
+    } else if (!stats.isDirectory()) {
+        console.error('The path specified is not a directory');
+    } else {
+        console.log('Log directory already exists');
+    }
+});
+
+if (!fs.existsSync(logDirectory)) {
+    try {
+        mkdirp.sync(logDirectory, { mode: 0o755 });
+        console.log('Log directory created successfully');
+    } catch (err) {
+        console.error('Error creating log directory:', err);
+    }
+} else {
+    console.log('Log directory already exists');
+}
 // Define the log file name
 const logFileName = 'app-%DATE%.log';
 
 // Define the log file path
 const logFilePath = path.join(logDirectory, logFileName);
+*/
+const folderName = 'logs';
+const folderPath = path.join(process.cwd(), folderName);
+if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
+    console.log('Folder created successfully.');
+} else {
+    console.log('Folder already exists.');
+}
+// Define the log file name
+const logFileName = 'app-%DATE%.log';
+const logFilePath = path.join(folderPath, logFileName);
 
 // Configure the logger
 const logger = winston.createLogger({
@@ -52,7 +109,6 @@ console.log("app started......")
 logger.info("App started...");
 const secretKey = "XkhZG4fW2t2W";
 //tab 1
-
 
 cron.schedule(`${process.env.corntab}`, () => {
     //staerted
@@ -91,13 +147,13 @@ cron.schedule(`${process.env.corntab}`, () => {
             const result2 = decryptData(row.ladc_password, secretKey)
             if (result2.success) {
                 console.log("Decryption successful. Decrypted data:", result.data);
-                logger.info("Decryption successful. Decrypted data:", result2.data);
+                // logger.info("Decryption successful. Decrypted data:", result2.data);
 
                 lcdspass = result2.data
             } else {
                 lcdspass = row.ladc_password
                 console.error("Decryption failed. Error:", lcdspass);
-                logger.error("Decryption failed. Error:", lcdspass);
+                // logger.error("Decryption failed. Error:", lcdspass);
             }
             const acdc_username = row.acdc_username
             const acdc_url = row.acdc_url
@@ -123,7 +179,7 @@ cron.schedule(`${process.env.corntab}`, () => {
                     console.error(`
                                         Failed to get Primary deployed applications: $ { err }
                                         `);
-                    logger.error(`Failed to get Primary deployed applications: ${err}`);
+                    // logger.error(`Failed to get Primary deployed applications: ${err}`);
                 });
             console.log("secondary")
                 //secondary
@@ -136,8 +192,10 @@ cron.schedule(`${process.env.corntab}`, () => {
                 })
                 .catch((err) => {
                     console.error(`
-                                        Failed to get Secondary deployed applications: $ { err }
+                                        Failed to get Secondary deployed applications: ${ err }
                                         `);
+                    logger.error(`
+            Failed to get Secondary deployed applications: ${ err } `);
                 });
 
             //  await warCheckerData.updateConfigs(row.id);
@@ -165,9 +223,9 @@ cron.schedule(`${process.env.corntab}`, () => {
 cron.schedule(`${process.env.corntab2}`, () => {
     //staerted
     console.log("---------jobs 2------")
-    logger.info("---------jobs 2 started------")
+        // logger.info("---------jobs 2 started------")
     console.log('Task running every 30 minutes');
-    logger.info(`Task running twice --- ${process.env.corntab2}`);
+    // logger.info(`Task running twice --- ${process.env.corntab2}`);
 
     warCheckerData.checkData().then(async rows => {
         for (const row of rows) {
@@ -187,12 +245,12 @@ cron.schedule(`${process.env.corntab2}`, () => {
             const result = decryptData(row.acdc_password, secretKey)
             if (result.success) {
                 console.log("Decryption successful. Decrypted data:", result.data);
-                logger.info("Decryption successful. Decrypted data:", result.data);
+                // logger.info("Decryption successful. Decrypted data:", result.data);
 
                 acdspass = result.data
             } else {
                 acdspass = row.acdc_password
-                logger.error("Decryption failed. Error:", acdspass);
+                    // logger.error("Decryption failed. Error:", acdspass);
                 console.error("Decryption failed. Error:", acdspass);
             }
             const result2 = decryptData(row.ladc_password, secretKey)
@@ -220,6 +278,8 @@ cron.schedule(`${process.env.corntab2}`, () => {
             const location2 = 'Secondary';
 
             //primary
+            console.log("primary")
+            logger.info("primary")
             const acdcweblogic = new WebLogicAPI(acdc_url, acdc_username, acdc_password, cluster_name, teamid, location1)
             await acdcweblogic.getDeployedApplications()
                 .then((appList) => {
@@ -233,6 +293,7 @@ cron.schedule(`${process.env.corntab2}`, () => {
                     logger.error(`Failed to get Primary deployed applications: ${err}`);
                 });
             console.log("secondary")
+            logger.info("secondary")
                 //secondary
             const ldcweblogic = new WebLogicAPI(ladc_url, ladc_username, ladc_password, cluster_name, teamid, location2)
             await ldcweblogic.getDeployedApplications()
@@ -245,6 +306,10 @@ cron.schedule(`${process.env.corntab2}`, () => {
                     console.error(`
                                         Failed to get Secondary deployed applications: $ { err }
                                         `);
+
+                    logger.error(`
+                 Failed to get Secondary deployed applications: $ { err }
+                 `);
                 });
 
 
