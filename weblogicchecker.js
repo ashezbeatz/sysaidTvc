@@ -223,7 +223,7 @@ cron.schedule(`${process.env.corntab}`, () => {
 cron.schedule(`${process.env.corntab2}`, () => {
     //staerted
     console.log("---------jobs 2------")
-        // logger.info("---------jobs 2 started------")
+    logger.info("---------jobs 2 started------")
     console.log('Task running every 30 minutes');
     // logger.info(`Task running twice --- ${process.env.corntab2}`);
 
@@ -330,6 +330,101 @@ cron.schedule(`${process.env.corntab2}`, () => {
     logger.info("---------jobs 2 ended------")
         //end
 });
+
+
+
+///jobs 3
+
+cron.schedule(`${process.env.corntab3}`, () => {
+    console.log("---------jobs 3------")
+    logger.info("---------jobs 3 started------")
+    console.log('Task running every 30 minutes');
+    logger.info(`------------ >>>> crontab : ${process.env.corntab3} <<<<<<<<<< ---------`)
+
+    warCheckerData.checkDataForcherere().then(
+        async rows => {
+            const duplicates = [];
+            const duplicatesWithDates = {};
+            for (const row of rows) {
+                const key = `${row.appname}-${row.config_name}`;
+
+                if (duplicates.includes(key)) {
+                    const existingDate = duplicatesWithDates[key].update_time;
+                    console.log(`Duplicate found - Name: ${row.id} ${row.appname}, Configuration: ${row.config_name},
+                    new Date :${row.update_time}  Date: ${duplicatesWithDates[key].update_time}`);
+                    if (row.check_sum === null || duplicatesWithDates[key].check_sum === null) {
+                        console.log(`Skipping - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        console.log(" check is null.");
+                        logger.info(`Skipping - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        logger.info(" check is null.");
+                    } else if (row.check_sum === duplicatesWithDates[key].check_sum) {
+                        console.log(" all files are up to date");
+                        logger.info(" all files are up to date");
+                        warCheckerData.updateAppStatus(row.id, 'up to date')
+                        warCheckerData.updateAppStatus(duplicatesWithDates[key].id, 'up to date')
+                    } else if (row.update_time === null || existingDate === null) {
+                        console.log(`Skipping - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        console.log("    Date is null.");
+                        logger.info(`Skipping - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        logger.info("    Date is null.");
+                        // continue; // Skip processing and move to the next row
+                    } else if (row.update_time === existingDate) {
+                        console.log(`Duplicate found - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        console.log(`    Newer Date: ${row.update_time}`);
+                        console.log(`    Existing Date: ${existingDate}`);
+                        console.log("    Dates are the same.");
+
+                        logger.info(`Duplicate found - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        logger.info(`    Newer Date: ${row.update_time}`);
+                        logger.info(`    Existing Date: ${existingDate}`);
+                        logger.info("    Dates are the same.");
+
+                        warCheckerData.updateAppStatus(row.id, 'up to date')
+                        warCheckerData.updateAppStatus(duplicatesWithDates[key].id, 'up to date')
+
+                    } else if (row.update_time > existingDate) {
+                        console.log(`Duplicate found - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        console.log(`    Newer Date: ${row.update_time}`);
+                        console.log(`    Existing Date: ${existingDate}`);
+                        console.log("    Newer Date is up to date.");
+                        warCheckerData.updateAppStatus(row.id, 'up to date')
+                        warCheckerData.updateAppStatus(duplicatesWithDates[key].id, 'out of date')
+
+                        // duplicatesWithDates[key] = row;
+                    } else {
+                        console.log(`Duplicate found - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        console.log(`    Newer Date: ${row.update_time}`);
+                        console.log(`    Existing Date: ${existingDate}`);
+                        console.log("    Newer Date is out of date.");
+                        logger.info(`Duplicate found - Name: ${row.appname}, Configuration: ${row.config_name}`);
+                        logger.info(`    Newer Date: ${row.update_time}`);
+                        logger.info(`    Existing Date: ${existingDate}`);
+                        logger.info("    Newer Date is out of date.");
+
+                        warCheckerData.updateAppStatus(row.id, 'out to date')
+                        warCheckerData.updateAppStatus(duplicatesWithDates[key].id, 'up to date')
+
+                    }
+
+
+                } else {
+                    console.log(`Name: ${row.appname}, Configuration: ${row.config_name}, Date: ${row.update_time}`);
+                    logger.info(`Name: ${row.appname}, Configuration: ${row.config_name}, Date: ${row.update_time}`);
+                    duplicates.push(key);
+                    duplicatesWithDates[key] = row; // Assuming the date column is named 'date'
+                }
+
+            }
+
+
+
+        }
+
+    ).catch(error => {
+        console.log(error)
+    })
+})
+
 
 function trimProtocol(url) {
     return url.replace(/^https?:\/\//i, "");

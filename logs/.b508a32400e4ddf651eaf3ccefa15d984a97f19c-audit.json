@@ -34,6 +34,11 @@
             "date": 1687516480052,
             "name": "/Users/mac/TVCSysaid/logs/app-2023-06-23.log",
             "hash": "3b9aa818503b9c95a8fefa10f8b787b21c7b4dfc29b71fb441761a44c425b88e"
+        },
+        {
+            "date": 1687769915791,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-26.log",
+            "hash": "65a80b956ab2ad0c21057727f9584ab2f3e724828366750aca809b39e2049093"
         }
     ],
     "hashType": "sha256"

@@ -51,6 +51,41 @@ class warCheckerData {
             return [];
         }
     }
+    static async checkDataForcherere() {
+        let connection;
+        try {
+            connection = await db.pool.getConnection();
+            const query = `SELECT * FROM application_info`
+
+            const [rows, fields] = await connection.query(query);
+            connection.release();
+            console.log(rows);
+            return rows;
+
+        } catch (error) {
+            connection.release();
+            console.log(error);
+            return [];
+        }
+    }
+
+
+    static async updateAppStatus(id, status) {
+        let connection;
+        try {
+
+            connection = await db.pool.getConnection();
+            const query = ` UPDATE application_info SET port=? WHERE id=?`;
+            const values2 = [status, id];
+            const [rows, fields] = await connection.query(query, values2);
+
+            connection.release();
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
 
     static async insertAppInfo(info, teamid, catergory, location) {
         let connection;
