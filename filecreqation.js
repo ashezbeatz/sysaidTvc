@@ -1,58 +1,88 @@
 const fs = require('fs');
 const path = require('path');
 
-function getFiles(directory) {
-    let fileList = [];
+const folderName = 'newFolder';
+const folderPath = path.join(process.cwd(), folderName);
 
-    function traverseDirectory(dir) {
-        const files = fs.readdirSync(dir);
+if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
+    console.log('Folder created successfully.');
+} else {
+    console.log('Folder already exists.');
+}
 
-        files.forEach(file => {
-            const filePath = path.join(dir, file);
-            const stats = fs.statSync(filePath);
 
-            if (stats.isDirectory()) {
-                traverseDirectory(filePath); // Recursively traverse subdirectories
-            } else if (stats.isFile()) {
-                fileList.push(filePath);
+
+async function processFolder(folderPath) {
+    const files = fs.readdirSync(folderPath);
+    const result = []; // Array to store all file information
+    const currentFiles = []; // Array to store current (non-duplicate) file information
+
+    for (const file of files) {
+        const filePath = path.join(folderPath, file);
+        const stat = fs.statSync(filePath);
+
+        if (stat.isFile()) {
+            const checksum = await getChecksum(filePath);
+            const fileNameWithExtension = path.basename(filePath);
+            const fileName = path.parse(fileNameWithExtension).name;
+            const { size, birthtime, mtime } = stat;
+
+            const fileData = {
+                filePath,
+                fileNameWithExtension,
+                fileName,
+                size: formatSize(size),
+                birthtime,
+                mtime: formatDate(mtime),
+                newDate: formatDate(birthtime),
+                checksum
+            };
+
+            result.push(fileData); // Add file information to the array
+
+            // Check for duplicates
+            const duplicates = result.filter(f => f.fileName === fileName && f.size === formatSize(size));
+            if (duplicates.length > 1) {
+                // Sort duplicates by date (mtime) in descending order
+                duplicates.sort((a, b) => b.mtime - a.mtime);
+
+                // Add the file with the latest date (current file) to the separate array
+                currentFiles.push(duplicates[0]);
+            } else {
+                currentFiles.push(fileData); // Add the current (non-duplicate) file to the separate array
             }
-        });
+
+            console.log(`File: ${filePath}`);
+            logger.info(`File: ${filePath}`);
+            console.log(`File Name with extension: ${path.basename(filePath)}`);
+            logger.info(`File Name with extension: ${path.basename(filePath)}`);
+            console.log(`File Name : ${fileName}`);
+            logger.info(`File Name : ${fileName}`);
+            console.log(`Size: ${formatSize(size)} bytes`);
+            logger.info(`Size: ${formatSize(size)} bytes`);
+            console.log(` created Date: ${birthtime}`);
+            logger.info(` created Date: ${birthtime}`);
+            console.log(` updated Date: ${formatDate(mtime)}`);
+            logger.info(` updated Date: ${formatDate(mtime)}`);
+            console.log(`New Date: ${formatDate(birthtime)}`);
+            logger.info(`New Date: ${formatDate(birthtime)}`);
+            console.log(`Checksum: ${checksum}`);
+            logger.info(`Checksum: ${checksum}`);
+            console.log('---');
+
+            const info = getMachineInfo();
+            const ipaddress = info.ipAddresses ? info.ipAddresses : process.env.serverip
+
+        } else if (stat.isDirectory()) {
+            const subfolderFiles = await processFolder(filePath); // Recursively process subfolders
+            result.push(...subfolderFiles); // Add files from subfolders to the array
+        }
     }
 
-    traverseDirectory(directory);
-
-    return fileList;
+    return currentFiles; // Return the array of current (non-duplicate) file information
 }
 
-function checkDuplicateFileNames(directory) {
-    const files = getFiles(directory);
-    const fileNames = files.map(filePath => path.basename(filePath));
 
-    const duplicates = {};
 
-    fileNames.forEach(fileName => {
-        if (duplicates[fileName]) {
-            duplicates[fileName].push(fileName);
-        } else {
-            duplicates[fileName] = [fileName];
-        }
-    });
-
-    const duplicateFiles = Object.values(duplicates).filter(names => names.length > 1);
-
-    return duplicateFiles;
-}
-
-// Usage example
-const directoryPath = '/path/to/directory';
-const duplicateFiles = checkDuplicateFileNames(directoryPath);
-
-console.log('All files:');
-getFiles(directoryPath).forEach(filePath => {
-    console.log(filePath);
-});
-
-console.log('\nDuplicate file names:');
-duplicateFiles.forEach(fileNames => {
-    console.log(fileNames.join('\n'));
-});
+const data = processFolder('/Users/mac/Desktop/untitled folder 2/Output')

@@ -137,12 +137,12 @@ class warCheckerData {
             connection = await db.pool.getConnection();
             const query = `INSERT INTO application_info(appname,
                 config_name,create_date,created_by,
-                partition_location,teamid,ip_address,port)
-                VALUES(?,?,NOW(),?,?,?,?,?)
+                partition_location,teamid,ip_address)
+                VALUES(?,?,NOW(),?,?,?,?)
                 
             `;
             const values2 = [name, catergory, 'jobs',
-                location, teamid, ip, port
+                location, teamid, ip
             ];
             const querySelect = `
               SELECT  id,appname FROM  application_info WHERE 
@@ -151,11 +151,15 @@ class warCheckerData {
             const [rowsd, fieldsd] = await connection.query(querySelect, values);
             if (rowsd.length > 0) {
 
+                // const quries =
+                //     `UPDATE application_info SET ip_address= ?, port= ? 
+                //     WHERE  appname= ? AND teamid= ? 
+                //      AND partition_location= ? and config_name=?`;
                 const quries =
-                    `UPDATE application_info SET ip_address= ?, port= ? 
-                    WHERE  appname= ? AND teamid= ? 
-                     AND partition_location= ? and config_name=?`;
-                const valuesD = [ip, port, name, teamid, location, catergory];
+                    `UPDATE application_info SET ip_address= ? , port= ?
+                WHERE  appname= ? AND teamid= ? 
+                 AND partition_location= ? and config_name=?`;
+                const valuesD = [ip, '', name, teamid, location, catergory];
                 const [rowsds, fieldsds] = await connection.query(quries, valuesD);
                 console.log('Data already exists');
                 connection.release();

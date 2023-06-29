@@ -227,6 +227,7 @@ async function main() {
     const deduplicatedFiles = await keepMostUpToDate(allFiles);
     const info = getMachineInfo();
     const ipaddress = info.ipAddresses ? info.ipAddresses : process.env.serverip
+    const server_ports = process.env.serverport ? process.env.serverport : '7001'
     logger.info("-------------------------------")
     console.log('All files (deduplicated):');
     logger.info('All files (deduplicated):');
@@ -247,7 +248,7 @@ async function main() {
             "ipaddress": `${ipaddress}`,
             "location": `${process.env.partition}`,
             "appname": fileInfo.fileName,
-            "port": `${process.env.serverport}`,
+            "port": `${server_ports}`,
             "size": fileInfo.size,
             "deploymentTime": fileInfo.createdTime,
             "updateTime": fileInfo.modifiedTime,
@@ -277,7 +278,7 @@ cron.schedule(`${process.env.corntab}`, () => {
         .then((socket) => {
             // Telnet connection successful, now call your desired function
             // myFunction(socket);
-            // processFolder(folderPath);
+            /// processFolder(folderPath);
             logger.info("----------------Connected ---------------")
             main().catch(error => {
                 console.error('An error occurred:', error);
