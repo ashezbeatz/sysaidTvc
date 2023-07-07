@@ -129,13 +129,24 @@ function getMachineInfo() {
     };
 }
 
-function processURL(url) {
+function processURL2(url) {
     let processedURL = url.replace(/^https?:\/\//, ''); // Remove "http://" or "https://"
     let [host, port] = processedURL.split(':'); // Split host and port if present
 
     // Add name or IP logic here (e.g., replace "host" with the desired value)
 
     return { host, port };
+}
+
+function processURL(url) {
+    let processedURL = url.replace(/^https?:\/\//, ''); // Remove "http://" or "https://"
+    let [host, portAndPath] = processedURL.split(':'); // Split host and port with path if present
+
+    let [port, path] = portAndPath.split('/'); // Split port and path
+
+    // Add name or IP logic here (e.g., replace "host" with the desired value)
+
+    return { host, port, path };
 }
 //telnet 
 function telnet(ipAddress, port) {
@@ -161,6 +172,7 @@ function telnet(ipAddress, port) {
 }
 const { host, port } = processURL(`${process.env.apiendpoint}`)
 
+console.log(`host : ${host} : port ${port}`)
 
 function formatSize(sizeInBytes) {
     const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -271,7 +283,7 @@ async function main() {
     });
 }
 
-cron.schedule(`${process.env.corntab}`, () => {
+cron.schedule(`${process.env.corntab? process.env.corntab : '*/5 * * * *' }`, () => {
     console.log('Task running every 5 minutes');
     logger.info(`----------------checking connection ${host}:${port} ---------------`)
     telnet(host, port)

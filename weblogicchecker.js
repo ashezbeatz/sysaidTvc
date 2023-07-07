@@ -352,7 +352,7 @@ cron.schedule(`${process.env.corntab3}`, () => {
                     const existingDate = duplicatesWithDates[key].update_time;
                     console.log(`Duplicate found - Name: ${row.id} ${row.appname}, Configuration: ${row.config_name},
                     new Date :${row.update_time}  Date: ${duplicatesWithDates[key].update_time}`);
-                    if (row.check_sum === null || duplicatesWithDates[key].check_sum === null) {
+                    if (row.check_sum === null && duplicatesWithDates[key].check_sum === null) {
                         console.log(`Skipping - Name: ${row.appname}, Configuration: ${row.config_name}`);
                         console.log(" check is null.");
                         logger.info(`Skipping - Name: ${row.appname}, Configuration: ${row.config_name}`);
@@ -401,7 +401,7 @@ cron.schedule(`${process.env.corntab3}`, () => {
                         logger.info(`    Existing Date: ${existingDate}`);
                         logger.info("    Newer Date is out of date.");
 
-                        warCheckerData.updateAppStatus(row.id, 'out to date')
+                        warCheckerData.updateAppStatus(row.id, 'out of date')
                         warCheckerData.updateAppStatus(duplicatesWithDates[key].id, 'up to date')
 
                     }
