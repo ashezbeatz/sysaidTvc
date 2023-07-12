@@ -6,44 +6,19 @@
     "auditLog": "/Users/mac/TVCSysaid/logs/.b508a32400e4ddf651eaf3ccefa15d984a97f19c-audit.json",
     "files": [
         {
-            "date": 1686841851720,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-15.log",
-            "hash": "ca5b9ef1349c7c2e990e8274453c9c629273d7c1ad5e940490eb9525412d00fa"
-        },
-        {
-            "date": 1686919709222,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-16.log",
-            "hash": "f77bf0c4297f672a506a2978a9fbe0fcccdf9d902e6510c24702fe238f8bd158"
-        },
-        {
-            "date": 1687164003561,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-19.log",
-            "hash": "cc99ce001650e75243c317706bf36a60fcfbb27d495af864d88b049d1786ce6c"
-        },
-        {
-            "date": 1687338430656,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-21.log",
-            "hash": "dbaaee4890250429e400a4fbad21a78dbf8b9b56aac30199c5442aa9b728e5ef"
-        },
-        {
-            "date": 1687423144381,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-22.log",
-            "hash": "43639566361dd8270ee86db2025ee4149dbdc72c58f1c546146d284d01f3c1de"
-        },
-        {
-            "date": 1687516480052,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-23.log",
-            "hash": "3b9aa818503b9c95a8fefa10f8b787b21c7b4dfc29b71fb441761a44c425b88e"
-        },
-        {
-            "date": 1687769915791,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-26.log",
-            "hash": "65a80b956ab2ad0c21057727f9584ab2f3e724828366750aca809b39e2049093"
-        },
-        {
             "date": 1688044049507,
             "name": "/Users/mac/TVCSysaid/logs/app-2023-06-29.log",
             "hash": "71cf79c54e17d4460ce3275687a4ea4da841688ab23d7dd8295364062741c729"
+        },
+        {
+            "date": 1689072272825,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-07-11.log",
+            "hash": "f44559dee9703ac5d2fa0ad3e68d2a262217cb35150a2e72f125d9d6a8b1efa7"
+        },
+        {
+            "date": 1689152235465,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-07-12.log",
+            "hash": "d2b6a1ce31140733a147c84e9a474f04fe0f37fa722a6a61adbdf8dfa4d3422e"
         }
     ],
     "hashType": "sha256"

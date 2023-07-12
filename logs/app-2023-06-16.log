@@ -1,3 +1,0 @@
-info: ----------------checking connection--------------- {"timestamp":"2023-06-16 12:48:29"}
-error: error occuriedError: connect ECONNREFUSED 127.0.0.1:9089 {"timestamp":"2023-06-16 12:48:29"}
-error: Telnet connection error: Error: connect ECONNREFUSED 127.0.0.1:9089 {"timestamp":"2023-06-16 12:48:29"}

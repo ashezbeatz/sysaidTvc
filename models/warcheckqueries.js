@@ -70,6 +70,24 @@ class warCheckerData {
     }
 
 
+    static async checkPropertyData() {
+        let connection;
+        try {
+            connection = await db.pool.getConnection();
+            const query = `SELECT appname,config_name,path FROM property_files_info`
+
+            const [rows, fields] = await connection.query(query);
+            connection.release();
+            console.log(rows);
+            return rows;
+
+        } catch (error) {
+            connection.release();
+            console.log(error);
+            return [];
+        }
+    }
+
     static async updateAppStatus(id, status) {
         let connection;
         try {
@@ -156,10 +174,10 @@ class warCheckerData {
                 //     WHERE  appname= ? AND teamid= ? 
                 //      AND partition_location= ? and config_name=?`;
                 const quries =
-                    `UPDATE application_info SET ip_address= ? , port= ?
+                    `UPDATE application_info SET ip_address= ? 
                 WHERE  appname= ? AND teamid= ? 
                  AND partition_location= ? and config_name=?`;
-                const valuesD = [ip, '', name, teamid, location, catergory];
+                const valuesD = [ip, name, teamid, location, catergory];
                 const [rowsds, fieldsds] = await connection.query(quries, valuesD);
                 console.log('Data already exists');
                 connection.release();
