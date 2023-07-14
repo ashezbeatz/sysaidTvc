@@ -74,7 +74,7 @@ class warCheckerData {
         let connection;
         try {
             connection = await db.pool.getConnection();
-            const query = `SELECT appname,config_name,path FROM property_files_info`
+            const query = `SELECT id,appname,config_name,path FROM property_files_info`
 
             const [rows, fields] = await connection.query(query);
             connection.release();
@@ -87,6 +87,25 @@ class warCheckerData {
             return [];
         }
     }
+
+
+    static async updatePropsFileStatus(id, status, comments) {
+        let connection;
+        try {
+
+            connection = await db.pool.getConnection();
+            const query = ` UPDATE property_files_info SET compare_details=?,checkres=? WHERE id=?`;
+            const values2 = [JSON.stringify(status), comments, id];
+            const [rows, fields] = await connection.query(query, values2);
+
+            connection.release();
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
+
 
     static async updateAppStatus(id, status) {
         let connection;

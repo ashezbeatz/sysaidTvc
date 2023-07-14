@@ -6,11 +6,6 @@
     "auditLog": "/Users/mac/TVCSysaid/logs/.b508a32400e4ddf651eaf3ccefa15d984a97f19c-audit.json",
     "files": [
         {
-            "date": 1688044049507,
-            "name": "/Users/mac/TVCSysaid/logs/app-2023-06-29.log",
-            "hash": "71cf79c54e17d4460ce3275687a4ea4da841688ab23d7dd8295364062741c729"
-        },
-        {
             "date": 1689072272825,
             "name": "/Users/mac/TVCSysaid/logs/app-2023-07-11.log",
             "hash": "f44559dee9703ac5d2fa0ad3e68d2a262217cb35150a2e72f125d9d6a8b1efa7"
@@ -19,6 +14,11 @@
             "date": 1689152235465,
             "name": "/Users/mac/TVCSysaid/logs/app-2023-07-12.log",
             "hash": "d2b6a1ce31140733a147c84e9a474f04fe0f37fa722a6a61adbdf8dfa4d3422e"
+        },
+        {
+            "date": 1689322677977,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-07-14.log",
+            "hash": "4015830ea9cbd2c31b1e72c91068a5a5c840c9424910e884cc0ec64a1cb23d9e"
         }
     ],
     "hashType": "sha256"

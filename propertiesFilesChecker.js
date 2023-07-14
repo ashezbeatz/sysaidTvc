@@ -267,16 +267,16 @@ async function main() {
         const ipaddress = info.ipAddresses ? info.ipAddresses : process.env.serverip
         const server_ports = process.env.serverport ? process.env.serverport : '7001'
         deduplicatedFiles.forEach(fileInfo => {
-            logger.info("-------------------------------")
-            console.log(`File Name: ${fileInfo.fileName}`);
-            console.log(`File: ${fileInfo.filePath}`);
-            console.log(`Size: ${fileInfo.size} bytes`);
-            console.log(`Created: ${fileInfo.createdTime}`);
-            console.log(`Modified: ${fileInfo.modifiedTime}`);
-            console.log(`Checksum: ${fileInfo.checksum}`);
-            console.log(`ipAdress: ${ipaddress}`);
-            console.log(`File name with extension: ${fileInfo.fileNamewithExt}`);
-            console.log('-------------------------');
+            /*  logger.info("-------------------------------")
+              console.log(`File Name: ${fileInfo.fileName}`);
+              console.log(`File: ${fileInfo.filePath}`);
+              console.log(`Size: ${fileInfo.size} bytes`);
+              console.log(`Created: ${fileInfo.createdTime}`);
+              console.log(`Modified: ${fileInfo.modifiedTime}`);
+              console.log(`Checksum: ${fileInfo.checksum}`);
+              console.log(`ipAdress: ${ipaddress}`);
+              console.log(`File name with extension: ${fileInfo.fileNamewithExt}`);
+              console.log('-------------------------');*/
 
             /* const fileData = {
                  file: fs.createReadStream(fileInfo.filePath)
@@ -293,37 +293,47 @@ async function main() {
              }*/
             const fileExtension = fileInfo.fileNamewithExt.split('.').pop().toLowerCase();
             if (fileExtension === 'txt' || fileExtension === 'properties') {
-
                 console.log("tat :" + fileInfo.fileName)
+                logger.info("-------------properties ------------------")
+                console.log(`File Name: ${fileInfo.fileName}`);
+                console.log(`File: ${fileInfo.filePath}`);
+                console.log(`Size: ${fileInfo.size} bytes`);
+                console.log(`Created: ${fileInfo.createdTime}`);
+                console.log(`Modified: ${fileInfo.modifiedTime}`);
+                console.log(`Checksum: ${fileInfo.checksum}`);
+                console.log(`ipAdress: ${ipaddress}`);
+                console.log(`File name with extension: ${fileInfo.fileNamewithExt}`);
+                console.log('-------------------------');
+                const formData = {
+                    jsonData: JSON.stringify({
+                        ipaddress: ipaddress.toString(),
+                        location: process.env.partition,
+                        appname: fileInfo.fileName,
+                        port: server_ports,
+                        size: fileInfo.size,
+                        deploymentTime: fileInfo.createdTime,
+                        updateTime: fileInfo.modifiedTime,
+                        checkSum: fileInfo.checksum
+                    }),
+                    file: fs.createReadStream(fileInfo.filePath)
+                };
+
+
+                console.log('Posting to API:------------');
+                logger.info('Posting to API:------------');
+                makeRequest(formData)
+                    .then(response => {
+                        // Handle the response
+                        console.log('Response:', response);
+                        logger.info('Response:', response);
+                    })
+                    .catch(error => {
+                        // Handle the error
+                        console.error('Error:', error);
+                        logger.error('Error:', error);
+                    });
             }
-            const formData = {
-                jsonData: JSON.stringify({
-                    ipaddress: ipaddress.toString(),
-                    location: process.env.partition,
-                    appname: fileInfo.fileName,
-                    port: server_ports,
-                    size: fileInfo.size,
-                    deploymentTime: fileInfo.createdTime,
-                    updateTime: fileInfo.modifiedTime,
-                    checkSum: fileInfo.checksum
-                }),
-                file: fs.createReadStream(fileInfo.filePath)
-            };
 
-
-            console.log('Posting to API:------------');
-            logger.info('Posting to API:------------');
-            makeRequest(formData)
-                .then(response => {
-                    // Handle the response
-                    console.log('Response:', response);
-                    logger.info('Response:', response);
-                })
-                .catch(error => {
-                    // Handle the error
-                    console.error('Error:', error);
-                    logger.error('Error:', error);
-                });
             /* postJSONData(jsonData)
                  .then(response => {
                      console.log('Response:', response);

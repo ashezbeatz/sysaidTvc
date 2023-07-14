@@ -12,6 +12,7 @@ warCheckerData.checkDataForcherere().then(
 
             if (duplicates.includes(row.appname) && duplicates.includes(row.config_name)) {
                 console.log(`Duplicate found - Name: ${row.appname}, Configuration: ${row.config_name}`);
+
             } else {
                 console.log(`Name: ${row.appname}, Configuration: ${row.config_name}`);
                 duplicates.push(row.appname, row.config_name);
