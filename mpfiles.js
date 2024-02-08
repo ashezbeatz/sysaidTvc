@@ -4,6 +4,7 @@ const { createLogger, transports } = require('winston');
 const fs = require('fs').promises;
 const path = require('path');
 const fsd = require('fs');
+const cron = require('node-cron');
 const warCheckerData = require('./models/warcheckqueries')
 
 
@@ -187,5 +188,12 @@ async function runComparison() {
          console.error('Error:', error.message);
      }*/
 }
+console.log("---------apps started ------")
+logger.info("---------app started------")
 
-runComparison();
+cron.schedule(`${process.env.corntab4}`, () => {
+    console.log("---------jobs ------")
+    logger.info("---------jobs 3 started------")
+    console.log('Task running every 30 minutes');
+    runComparison();
+})

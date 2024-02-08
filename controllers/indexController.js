@@ -24,7 +24,7 @@ class IndexController {
             const loops = await PostData.getSRS()
                 //console.log(loops)
             loops.forEach(async item => {
-                // console.log("asdasda"+item.sr_id);
+                console.log("asdasda" + item.sr_id);
 
                 const srDetails = await RestSysaidApi.getSRPerDetailsNew(sessionId, item.sr_id);
                 //console.log("sr Details "+srDetails)

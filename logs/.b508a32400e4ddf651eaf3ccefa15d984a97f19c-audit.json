@@ -19,6 +19,21 @@
             "date": 1689322677977,
             "name": "/Users/mac/TVCSysaid/logs/app-2023-07-14.log",
             "hash": "4015830ea9cbd2c31b1e72c91068a5a5c840c9424910e884cc0ec64a1cb23d9e"
+        },
+        {
+            "date": 1689848165027,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-07-20.log",
+            "hash": "83951888988fdb9c9b2e1b29b2a53643f1b1c3d23db84b5ac757e68a68a28108"
+        },
+        {
+            "date": 1689960725593,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-07-21.log",
+            "hash": "31bb3b0cf71ad510d088eaee14b08fd5794e9d6c39b32770ce21956602563899"
+        },
+        {
+            "date": 1690046984921,
+            "name": "/Users/mac/TVCSysaid/logs/app-2023-07-22.log",
+            "hash": "a8fd58804186bee7c9134b7798435c45245c169add6bd94e48086615ff6bcf10"
         }
     ],
     "hashType": "sha256"

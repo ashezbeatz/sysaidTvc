@@ -8,7 +8,7 @@ const rp = require('request-promise');
 const os = require('os');
 const net = require('net');
 require("dotenv").config();
-
+///const levenshtein = require('levenshtein-edit-distance');
 
 // Create a log directory path
 const logDirectory = path.join(process.cwd(), 'logs');
@@ -48,7 +48,10 @@ const logger = winston.createLogger({
     ]
 });
 
-
+function checkFileExtension(filePath, extensions) {
+    const fileExtension = path.extname(filePath);
+    return extensions.includes(fileExtension);
+}
 
 function getFiles(directory) {
     let fileList = [];
@@ -96,7 +99,90 @@ async function keepMostUpToDate(files) {
         const fileModifiedTime = stats.mtime;
         const fileChecksum = await calculateChecksum(file);
 
-        if (!fileMap[fileNameWithoutExt] || fileMap[fileNameWithoutExt].modifiedTime < fileModifiedTime) {
+        /*if (!fileMap[fileNameWithoutExt] || fileMap[fileNameWithoutExt].modifiedTime < fileModifiedTime) {
+            fileMap[fileNameWithoutExt] = {
+                fileName: fileNameWithoutExt,
+                filePath: file,
+                size: fileSize,
+                createdTime: formatDate(fileCreatedTime),
+                modifiedTime: formatDate(fileModifiedTime),
+                checksum: fileChecksum,
+                fileNamewithExt: path.basename(file),
+            };
+        }*/
+
+        const allowedExtensions = ['.txt', '.properties'];
+        if (checkFileExtension(path.basename(file), allowedExtensions)) {
+            console.log('File has an allowed extension.' + fileNameWithoutExt);
+            fileMap[fileNameWithoutExt] = {
+                fileName: fileNameWithoutExt,
+                filePath: file,
+                size: fileSize,
+                createdTime: formatDate(fileCreatedTime),
+                modifiedTime: formatDate(fileModifiedTime),
+                checksum: fileChecksum,
+                fileNamewithExt: path.basename(file),
+            };
+
+        } else {
+            console.log('File does not have an allowed extension.' + fileNameWithoutExt);
+        }
+    }
+
+    return Object.values(fileMap);
+}
+
+
+async function keepMostUpToDate2(files) {
+    const fileMap = {};
+
+    // Helper function to check if two files are similar based on Levenshtein distance
+    async function areFilesSimilar(file1, file2) {
+        const levenshtein = (await
+            import ('levenshtein-edit-distance')).default;
+
+        const distance = levenshtein(file1, file2);
+        return distance <= 3; // Adjust the similarity threshold as needed
+    }
+
+    for (const file of files) {
+        const fileNameWithoutExt = path.parse(file).name;
+        const stats = await fs.stat(file);
+        const fileSize = stats.size;
+        const fileCreatedTime = stats.birthtime;
+        const fileModifiedTime = stats.mtime;
+        const fileChecksum = await calculateChecksum(file);
+
+        const allowedExtensions = ['.txt', '.properties'];
+        if (!checkFileExtension(path.basename(file), allowedExtensions)) {
+            console.log('File does not have an allowed extension.' + fileNameWithoutExt);
+            continue;
+        }
+
+        // Check if the file is similar to any existing file in the fileMap
+        let isSimilarFileFound = false;
+        for (const existingFile of Object.values(fileMap)) {
+            if (areFilesSimilar(fileNameWithoutExt, existingFile.fileName)) {
+                // Check if the current file is more up-to-date than the existing similar file
+                if (fileModifiedTime > existingFile.modifiedTime) {
+                    // Replace the existing file with the current file in the fileMap
+                    fileMap[existingFile.fileName] = {
+                        fileName: fileNameWithoutExt,
+                        filePath: file,
+                        size: fileSize,
+                        createdTime: formatDate(fileCreatedTime),
+                        modifiedTime: formatDate(fileModifiedTime),
+                        checksum: fileChecksum,
+                        fileNamewithExt: path.basename(file),
+                    };
+                }
+                isSimilarFileFound = true;
+                break;
+            }
+        }
+
+        // If no similar file is found, add the current file to the fileMap
+        if (!isSimilarFileFound) {
             fileMap[fileNameWithoutExt] = {
                 fileName: fileNameWithoutExt,
                 filePath: file,
@@ -174,7 +260,7 @@ function telnet(ipAddress, port) {
 }
 const { host, port } = processURL(`${process.env.apiendpoint}`)
 
-console.log(`host : ${host} : port ${port}`)
+//console.log(`host : ${host} : port ${port}`)
 
 function formatSize(sizeInBytes) {
     const units = ['bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -352,5 +438,8 @@ async function main() {
 
 }
 
-
+console.log("---------apps started ------")
+logger.info("---------apps started------")
+    //cron.schedule(`${process.env.corntab2}`, () => {
 main();
+//})
